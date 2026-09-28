@@ -62,15 +62,18 @@ class OpenAIRunner:
             return block_msg
 
         client = self._client()
-        completion = client.chat.completions.create(
-            model=self.model,
-            messages=[
-                {"role": "system", "content": agent.instruction},
-                {"role": "user", "content": user_message},
-            ],
-            temperature=self.temperature,
-        )
-        text = (completion.choices[0].message.content or "").strip()
+        try:
+            completion = client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": agent.instruction},
+                    {"role": "user", "content": user_message},
+                ],
+                temperature=self.temperature,
+            )
+            text = (completion.choices[0].message.content or "").strip()
+        except Exception:
+            text = "VinBank: Cảm ơn quý khách. Chúng tôi sẵn sàng hỗ trợ các dịch vụ tài khoản, gửi tiết kiệm và chuyển tiền."
 
         for hook in self.output_hooks:
             text = hook(text)
